@@ -43,8 +43,8 @@ for testId = 1 : 4
     %% Parameters
     noise_p = 0.2; % Remove a specific proportion of noise
     L_render = [0,0,1]; % Light directions for render
-    Li_render = [5,5,5]; % Light intensities for render
-    Normal = myPMS(data, m, noise_p, L_render, Li_render);
+    I_render = [5,5,5]; % Light intensities for render
+    Normal = myPMS(data, m, noise_p, L_render, I_render);
 
     %% Save results "png"
     imwrite(uint8((Normal+1)*128).*uint8(mask3), strcat('../results/', dataName, '_Normal.png'));
