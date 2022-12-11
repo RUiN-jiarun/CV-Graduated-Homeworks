@@ -29,7 +29,7 @@ def knn(des1, des2, k):
     return matches
 
 
-def match(img1, img2, mode='sift', k=2, r=0.75, is_default=True):
+def match(img1, img2, mode='sift', k=2, r=0.75, is_default=True, is_show=False):
     if mode == 'sift':
         kp1, des1 = gen_sift(img1)
         kp2, des2 = gen_sift(img2)
@@ -49,8 +49,12 @@ def match(img1, img2, mode='sift', k=2, r=0.75, is_default=True):
             # print(m)
     
     res = cv2.drawMatches(img1, kp1, img2, kp2, matches, None) 
-    plt.imshow(res[:,:, ::-1])
-    plt.show()
+    cv2.imwrite('match.png', res)
+
+    if is_show:
+        plt.imshow(res[:,:, ::-1])
+        plt.show()
+        
     return kp1, kp2, matches
 
 
