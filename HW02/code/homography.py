@@ -64,22 +64,30 @@ def DLT(x, y):
     H = (vt[-1, :] / vt[-1, -1]).reshape(3, 3)
     return H
 
-def solve_homography(kp1, kp2, matches, threshold=5.0, max_iters=1000, is_default=True):
-    kp1_match = np.float32([ kp1[m.queryIdx].pt for m in matches ]).reshape(-1,1,2)
-    kp2_match = np.float32([ kp2[m.trainIdx].pt for m in matches ]).reshape(-1,1,2)
+def solve_homography(kp1, kp2, matches, threshold=5.0, max_iters=2000, is_default=True):
+    kp1_match = np.float32([kp1[m.queryIdx].pt for m in matches])
+    kp2_match = np.float32([kp2[m.trainIdx].pt for m in matches])
 
     if is_default:
-        H, _ = cv2.findHomography(kp1_match, kp2_match, cv2.RANSAC, threshold, max_iters)
+        H, mask = cv2.findHomography(kp2_match, kp1_match, cv2.RANSAC, threshold, max_iters)
+        mask = mask.ravel().tolist()
+        draw_params = dict(matchColor = (0,255,0),
+                        singlePointColor = (255, 0, 0),
+                        matchesMask = mask,
+                        flags = 2)
+        
     else:
-        H = ransac(kp1_match, kp2_match, threshold, max_iters)
+        H = ransac(kp2_match, kp1_match, threshold, max_iters)
+        draw_params = {}
 
-    return H
+    return H, draw_params
 
 if __name__ == '__main__':
     img1 = cv2.imread('../data/data1/112_1300.JPG')
     img2 = cv2.imread('../data/data1/113_1301.JPG')
     kp1, kp2, matches = match(img1, img2, is_default=True)
-    H = solve_homography(kp1, kp2, matches)
+    H, draw_params = solve_homography(kp1, kp2, matches)
     print(H)
-    H = solve_homography(kp1, kp2, matches, is_default=False)
+    ransac_res = cv2.drawMatches(img1, kp1, img2, kp2, matches, None, **draw_params)
+    H, _ = solve_homography(kp1, kp2, matches, is_default=False)
     print(H)
