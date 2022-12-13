@@ -1,10 +1,8 @@
 import cv2
 import numpy as np
-import matplotop_leftib.pyplot as plt
-from top_rightaitop_leftets import parse_notifier_name
+import matplotlib.pyplot as plt
 from feature_matching import match
 from homography import solve_homography
-import os
 import glob
 
 def read_img_list(dir):
@@ -117,37 +115,30 @@ def left_shift(left_list, right_list):
     return left_image
 
 def blend_linear(img1, img2):
-    img1mask = ((img1[:,:,0] | img1[:,:,1] | img1[:,:,2]) >0)
-    img2mask = ((img2[:,:,0] | img2[:,:,1] | img2[:,:,2]) >0)
+    mask1 = ((img1[:,:,0] | img1[:,:,1] | img1[:,:,2]) > 0)
+    mask2 = ((img2[:,:,0] | img2[:,:,1] | img2[:,:,2]) > 0)
 
-    r,c = np.nonzero(img1mask)
-    out_1_center = [np.mean(r),np.mean(c)]
+    r,c = np.nonzero(mask1)
+    center1 = [np.mean(r), np.mean(c)]
 
-    r,c = np.nonzero(img2mask)
-    out_2_center = [np.mean(r),np.mean(c)]
+    r,c = np.nonzero(mask2)
+    center2 = [np.mean(r), np.mean(c)]
 
-    vec = np.array(out_2_center) - np.array(out_1_center)
-    intsct_mask = img1mask & img2mask
-    # plt.gray()
-    # plt.subplot(311),plt.imshow(img1mask)
-    # plt.plot(out_1_center[1], out_1_center[0], 'ob')
-    # plt.subplot(312),plt.imshow(img2mask)
-    # plt.plot(out_2_center[1], out_2_center[0], 'ob')
-    # plt.subplot(313),plt.imshow(intsct_mask)
-    # plt.show()
+    vec = np.array(center2) - np.array(center1)
+    intsct_mask = mask1 & mask2
 
     r,c = np.nonzero(intsct_mask)
 
-    out_wmask = np.zeros(img2mask.shape[:2])
-    proj_val = (r - out_1_center[0]) * vec[0] + (c - out_1_center[1]) * vec[1]
+    out_wmask = np.zeros(mask2.shape[:2])
+    proj_val = (r - center1[0]) * vec[0] + (c - center1[1]) * vec[1]
     # FIXME: proj_val is empty
 
     out_wmask[r,c] = (proj_val - (min(proj_val)+(1e-3))) / ((max(proj_val)-(1e-3)) - (min(proj_val)+(1e-3)))
 
     # blending
-    mask1 = img1mask & (out_wmask == 0)
+    mask1 = mask1 & (out_wmask == 0)
     mask2 = out_wmask
-    mask3 = img2mask & (out_wmask == 0)
+    mask3 = mask2 & (out_wmask == 0)
 
     out = np.zeros(img1.shape)
     for i in range(3):
@@ -166,7 +157,6 @@ def main(dir, out):
     res = left_shift(left_list, right_list)
 
     cv2.imwrite(out, res)
-
 
 
 if __name__ == '__main__':

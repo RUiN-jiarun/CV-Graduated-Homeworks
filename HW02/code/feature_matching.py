@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 
 def gen_sift(img):
     # generate SIFT descriptor
@@ -13,7 +12,12 @@ def gen_sift(img):
 
 def gen_cpv(img):
     # generate discriptor formed by concatenated pixel values
-    pass
+    sift = cv2.SIFT_create()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  
+    kp = sift.detect(gray, None)
+    des = np.array([cv2.getRectSubPix(gray, (9, 9), p.pt).reshape(-1) for p in kp])
+    return kp, des
+
 
 def knn(des1, des2, k):
     matches = []
@@ -33,7 +37,8 @@ def match(img1, img2, mode='sift', k=2, r=0.7, is_default=True, is_show=False):
         kp1, des1 = gen_sift(img1)
         kp2, des2 = gen_sift(img2)
     elif mode == 'cpv':
-        pass
+        kp1, des1 = gen_cpv(img1)
+        kp2, des2 = gen_cpv(img2)
 
     if is_default:
         bf = cv2.BFMatcher()
@@ -60,7 +65,7 @@ def match(img1, img2, mode='sift', k=2, r=0.7, is_default=True, is_show=False):
                     matchesMask=mask,
                     flags=0)
     res = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches_raw, None, **draw_params) 
-    cv2.imwrite('match.png', res)
+    cv2.imwrite('../res/match.jpg', res)
 
     if is_show:
         plt.imshow(res[:,:, ::-1])
