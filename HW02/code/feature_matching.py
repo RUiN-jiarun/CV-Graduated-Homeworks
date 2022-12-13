@@ -21,9 +21,9 @@ def gen_cpv(img):
 
 def knn(des1, des2, k):
     matches = []
-    for i, f in enumerate(des1):
+    for i, p in enumerate(des1):
         fmatch = []
-        f_rep = f[None,:].repeat(des2.shape[0], 0)
+        f_rep = p[None,:].repeat(des2.shape[0], 0)
         distance = np.linalg.norm(f_rep - des2, axis=-1)
         idx = np.argsort(distance)
         for n in range(k):
