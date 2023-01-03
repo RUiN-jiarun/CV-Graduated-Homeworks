@@ -51,7 +51,6 @@ def left_shift(left_list, right_list):
         offset = [abs(int(min([0, img_pre.shape[1], top_left[0], bottom_left[0], top_right[0], bottom_right[0]]))),
                     abs(int(min([0, img_pre.shape[0], top_left[1], bottom_left[1], top_right[1], bottom_right[1]])))]
         dsize = (cx + offset[0], cy + offset[1])
-        print("image dsize: ", dsize, "offset", offset)
 
         top_left[0:2] += offset
         bottom_left[0:2] += offset
@@ -93,7 +92,6 @@ def left_shift(left_list, right_list):
         offset = [abs(int(min([0, left_image.shape[1], top_left[0], bottom_left[0], top_right[0], bottom_right[0]]))),
                     abs(int(min([0, left_image.shape[0], top_left[1], bottom_left[1], top_right[1], bottom_right[1]])))]
         dsize = (cx + offset[0], cy + offset[1])
-        print("image dsize: ", dsize, "offset", offset)
 
         top_left[0:2] += offset
         bottom_left[0:2] += offset
